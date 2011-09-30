@@ -478,3 +478,15 @@
 (define-exported-function string-or-empty (string)
   (or string ""))
 
+;; http://stackoverflow.com/questions/1511981/how-to-examine-list-of-defined-functions-from-common-lisp-repl-prompt
+(define-exported-function get-all-symbols (&optional package)
+  (let ((lst ())
+        (package (find-package package)))
+    (do-all-symbols (s lst)
+      (when (fboundp s)
+        (if package
+            (when (eql (symbol-package s) package)
+              (push s lst))
+            (push s lst))))
+    lst))
+
