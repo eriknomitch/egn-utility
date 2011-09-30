@@ -1,5 +1,6 @@
-;;;; package.lisp
-
+;; ===============================================
+;; UTILITY->PACKAGE ==============================
+;; ===============================================
 (in-package #:cl-user)
 
 (defpackage :utility
@@ -19,9 +20,7 @@
            :define-exported-macro
            :define-exported-class))
 
-(pushnew    :utility *features*)
+(pushnew :utility *features*)
 
 (in-package #:utility)
-
-
 
