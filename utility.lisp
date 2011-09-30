@@ -490,3 +490,6 @@
             (push s lst))))
     lst))
 
+(define-exported-function list-only-t (list)
+  (notany #'null list))
+
