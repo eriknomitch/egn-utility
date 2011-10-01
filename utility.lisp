@@ -506,6 +506,8 @@
      :initform nil
      :reader fpe-unique-slot)))
 
+(export '(fpe fpe-global fpe-unique-slot))
+
 ;; - - - - - - - - - - - - - - - - - - - - - - - -
 (define-method sb-mop:validate-superclass ((class fpe) (super-class standard-class))
   t)
