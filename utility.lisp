@@ -493,3 +493,53 @@
 (define-exported-function list-only-t (list)
   (notany #'null list))
 
+;; -----------------------------------------------
+;; CLASS->FPE ------------------------------------
+;; -----------------------------------------------
+(defclass fpe (standard-class)
+  ((global
+     :initarg :global
+     :initform nil
+     :reader fpe-global)
+   (unique-slot
+     :initarg :unique-slot
+     :initform nil
+     :reader fpe-unique-slot)))
+
+;; - - - - - - - - - - - - - - - - - - - - - - - -
+(define-method sb-mop:validate-superclass ((class fpe) (super-class standard-class))
+  t)
+
+(define-method initialize-instance :after ((fpe fpe) &key)
+  (setf (slot-value fpe 'global)
+        (car (fpe-global fpe)))
+  (setf (slot-value fpe 'unique-slot)
+        (car (fpe-unique-slot fpe))))
+
+;; - - - - - - - - - - - - - - - - - - - - - - - -
+(define-exported-macro fpe-push (class-name &rest initargs)
+ `(eval `(push ,(make-instance ,class-name ,@initargs)
+               ,(fpe-global (find-class ,class-name)))))
+
+(define-exported-function fpe-find (class-name unique)
+  (let* ((class (find-class class-name))
+         (found (remove-if-not #'(lambda (instance)
+                                   (equal unique
+                                          (slot-value instance (fpe-unique-slot class))))
+                  (eval (fpe-global class)))))
+    (and found
+         (car found))))
+
+(define-exported-function fpe-ensure-instance (instance)
+  (let ((class (class-of instance)))
+    (or (find instance (eval (fpe-global class)))
+        (eval `(push ,instance
+                     ,(fpe-global class))))))
+
+(define-exported-function fpe-ensure (instance)
+  (or (fpe-find (class-name-of instance)
+                (slot-value instance (fpe-unique-slot (class-of instance))))
+      (eval `(push ,instance
+                   ,(fpe-global (class-of instance))))))
+
+
